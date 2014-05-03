@@ -5,8 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>04dd5615-4e76-49a2-844a-713b681a673b</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>
-    </StartupFile>
+    <StartupFile>trees.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -24,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="trees.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="readme.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 </Project>

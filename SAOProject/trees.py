@@ -1,7 +1,5 @@
-from numpy import *
 import random
-import numpy
-import sets
+import numpy as np
 
 def edge_number(e):
     """Tricky way to convert edge into serial number"""
@@ -23,13 +21,14 @@ class Graph:
     """Graph data encapsulated"""
     size=0
     pairWeights=[]
+
     def len(self):
         return self.size
         
-    def __init__(self,size):
-        self.size=size
-        total = size*(size-1)/2
-        sample=numpy.random.random_sample((total, total))
+    def __init__(self,vertices):
+        self.vertices = vertices
+        edges = int(vertices*(vertices-1)/2)
+        graph = np.random.random_sample((edges, edges))
         #Removing diagonal entries, making matrix simmetric
         for x in range(0, total):
             for y in range(0, total):
@@ -70,7 +69,7 @@ class Tree:
         removed=self.data[selection]
         del self.data[selection]
         #produce merging sets (we can still travel to vertexes "navigability[x]" from vertex x)
-        navigability=[ sets.Set([x]) for x in range(0, self.size)]
+        navigability=[ set([x]) for x in range(0, self.size)]
         #removal of an edge splits tree into 2 subtrees
         subset1=navigability[removed[0]]
         subset2=navigability[removed[1]]
