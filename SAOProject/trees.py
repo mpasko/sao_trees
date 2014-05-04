@@ -1,5 +1,6 @@
 from random import choice
 from re import split
+from anneal import Annealer
 import numpy as np
 import networkx as nx
 
@@ -76,19 +77,34 @@ class SpanningTree:
 
         if possible_connections == []:
             tree.add_edge(v1, v2) # no changes
-            print("no change")
         else:
             edge = choice(possible_connections)
             tree.add_edge(edge[0], edge[1]) # new node
-            print(str((v1,v2)) + " -> " + str(edge))
+
+    def copy(self):
+        g = SpanningTree(self.graph)
+        g.tree = self.tree.copy()
+
+        return g
+
         
+
+def energy(state):
+    return state.getCost()
+
+def move(state):
+    state.randomChange()
+
+
         
 if __name__ == '__main__':
-    g = Graph("benchmark/n010d033C010c001Q010q001s-3i1.txt")
-    t = SpanningTree(g)
-    print(t.getCost())
-    for i in range(30):
-        t.randomChange()
-        print(t.getCost())
+    g = Graph("benchmark/n030d100C010c001Q010q001s-3i1.txt")
+    state = SpanningTree(g)
+
+    annealer = Annealer(energy, move)
+    schedule = annealer.auto(state, minutes=1)
+    state, e = annealer.anneal(state, schedule['tmax'], schedule['tmin'],  schedule['steps'], updates=6)
+    print(state.getCost())
+
 
     

@@ -14,4 +14,5 @@ http://homes.di.unimi.it/~cordone/research/DataQMST35-50.zip
 
 * numpy
 * networkx (graph manipulations)
+* anneal.py from https://github.com/perrygeo/python-simulated-annealing
 
