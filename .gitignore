@@ -154,3 +154,7 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+
+benchmark/
+DataQMST10-30.zip
+DataQMST35-50.zip
