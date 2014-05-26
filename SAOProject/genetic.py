@@ -13,13 +13,13 @@ class Individual:
         
 
 class Genetic:
-    def __init__(self, population, target_function, crossover_function, mutation_function):
+    def __init__(self, population, target_function, crossover_function, mutation_function, crossover_prob = 0.05, mutation_prob = 0.01):
         self.target_fun = target_function
         self.cross_fun = crossover_function
         self.mutat_fun = mutation_function
         self.population = population
-        self.crossover_prob = 0.5
-        self.mutation_prob = 0.01
+        self.crossover_prob = crossover_prob
+        self.mutation_prob = mutation_prob
 
         for ind in self.population:
             ind.fitness=target_function(ind.chromosome)
@@ -63,7 +63,13 @@ class Genetic:
 
             new_generation.append(new_individual)
 
-        self.population = [ Individual(self.mutat_fun(i.chromosome), self.target_fun) for i in new_generation if self.should_do_mutation() ]
+        self.population = []
+        for i in new_generation:
+            if self.should_do_mutation():
+                self.population.append(Individual(self.mutat_fun(i.chromosome), self.target_fun))
+            else:
+                self.population.append(Individual(i.chromosome, self.target_fun))
+
         
     def generations(self, iterations):
         for x in range(0, iterations):
