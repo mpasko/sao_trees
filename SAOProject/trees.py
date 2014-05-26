@@ -1,4 +1,4 @@
-from random import choice
+from random import choice, shuffle
 from re import split
 from anneal import Annealer
 import numpy as np
@@ -18,93 +18,147 @@ class Graph:
             edgePairsLine = [x for x in f.readline().replace(" ;", "").split("\t")  if "\n" not in x]
             edgePairs = [[int(y) for y in split('\[|\]|,',x) if y != ''] for x in edgePairsLine]
 
-            # converting to representation recognizable by networkX
-            edgeList = [(edge[0]-1, edge[1]-1, { 'weight' : edge[2] } ) for edge in edges]
-            # mapping between [v1,v2] and edge number used in q
+            # converting to representation recognizable by networkX ( zero-based indexing )
+            edgeList = [(edge[0]-1, edge[1]-1) for edge in edges]
+            # inverse of above, given edge tuple returns its index
             v2e = {(x[0],x[1]) : edgeList.index(x) for x in edgeList } 
             
-            edgePairList = [(v2e[(edge[0]-1, edge[1]-1)], v2e[(edge[2]-1, edge[3]-1)], { 'weight' : edge[4] } ) for edge in edgePairs]
-        
+            # pair costs are encoded as costs of edges between edges
+            # edge own costs is encoded as costs of loop connecting it to itself
+            q = np.zeros( (len(edgeList), len(edgeList)) )
+            for edge in edgePairs:
+                q[v2e[(edge[0]-1, edge[1]-1)], v2e[(edge[2]-1, edge[3]-1)]] = edge[4]
+
+            for edge in edges:
+                q[v2e[(edge[0]-1, edge[1]-1)], v2e[(edge[0]-1, edge[1]-1)]] = edge[2]
+
             self.c = nx.Graph(edgeList)  # adjacency matrix
-            self.q = nx.Graph(edgePairList) # matrix of costs between pairs of edges
+            self.q = nx.Graph(q) # matrix of costs between pairs of edges
             self.v2e = v2e
 
+""" 
+Generate a random tree using random walk over the graph.
 
-class SpanningTree:
-    """Tree data along with operations to manipulate it"""
-    def __init__(self,graph):
-        self.graph = graph
-        self.tree = self.randomSpanningTree()
+Based on RandomTreeWithRoot algorithm from: http://www.cs.cmu.edu/~15859n/RelatedWork/RandomTrees-Wilson.pdf
 
-    """ Generating random spanning tree using DFS search. Connecting each vertex to its predecessor generates spanning tree. """
-    def randomSpanningTree(self):
-        graph = self.graph.c
-        source = choice(graph.nodes()) # random start element
-        spanning_tree = nx.Graph()
-        # random spanning tree from predecessors
-        spanning_tree.add_edges_from([(u,v) for u,v in nx.dfs_predecessors(graph, source).items()])
-        return spanning_tree
-    
-    """ Cost of solution. The lower the better. """
-    def getCost(self):
-        edgeCosts = self.graph.c
-        pairCosts = self.graph.q
-        tree = self.tree
+"""
+def generateRandomSpanningTree(graph):
+    root = choice(graph.nodes())
+    Tree = set()
+    Next = { }
+    Tree.add(root)
+    Next[root] = None
 
-        s = sum([edgeCosts.get_edge_data(uv[0],uv[1])["weight"] for uv in tree.edges()])
-        edgePairs = [(self.graph.v2e[x], self.graph.v2e[y]) for x in tree.edges() for y in tree.edges()]
-        s += sum([pairCosts.get_edge_data(e[0],e[1])["weight"] for e in edgePairs if e[0] != e[1]]) 
+    for i in graph.nodes():
+        u = i
+        while u not in Tree:
+            Next[u] = choice(graph.neighbors(u))
+            u = Next[u]
 
-        return s
-    
-    """ Makes random change to the state """
-    def randomChange(self):
-        # edge chosen to remove
-        tree = self.tree 
-        graph= self.graph.c
-        v1 = choice(tree.nodes())
-        v2 = choice(tree.neighbors(v1))
-        #removal of an edge splits tree into 2 subtrees
-        tree.remove_edge(v1,v2)
+        u = i
 
-        # we obtain nodes accesible from each vertex
-        n1 = nx.dfs_tree(tree, v1).nodes()
-        n2 = nx.dfs_tree(tree, v2).nodes()
+        while u not in Tree:
+            Tree.add(u)
+            u = Next[u]
 
-        # we list possible candidates for new connection
-        possible_connections = [(u,v) for u in n1 for v in n2 if graph.has_edge(u, v)]
-        possible_connections.remove((v1,v2)) # remove previous connection
+    spanning_tree = nx.Graph()
+    for u,v in Next.items():
+        if v != None:
+            spanning_tree.add_edge(u,v)
 
-        if possible_connections == []:
-            tree.add_edge(v1, v2) # no changes
-        else:
-            edge = choice(possible_connections)
-            tree.add_edge(edge[0], edge[1]) # new node
+    return spanning_tree
 
-    def copy(self):
-        g = SpanningTree(self.graph)
-        g.tree = self.tree.copy()
+""" 
+Get the cost of the tree.
+"""
+def getCost(tree, edgePairCosts, v2e):  
+    cost = 0.0
+    edges = tree.edges()
+    for x in edges:
+        for y in edges:
+            cost += edgePairCosts.get_edge_data(v2e[x],v2e[y])["weight"]
 
-        return g
+    return cost
+""" 
+Mutate the tree. Select random edge. Delete it and then try to connect two smaller trees with another edge. 
+If no other is available return to initial tree.
+"""
+def mutation(tree, graph):
+    v1 = choice(tree.nodes())
+    v2 = choice(tree.neighbors(v1)) # choice could be made to be proportional to weight of removed edge (the bigger the weight the more probably to be removed)
+    #removal of an edge splits tree into 2 subtrees
+    tree.remove_edge(v1,v2)
 
-        
-
-def energy(state):
-    return state.getCost()
-
-def move(state):
-    state.randomChange()
+    # we obtain nodes accesible from each vertex
+    n1 = nx.dfs_tree(tree, v1).nodes()
+    n2 = nx.dfs_tree(tree, v2).nodes()
 
 
-        
+    # we list possible candidates for new connection
+    possible_connections = [(u,v) for u in n1 for v in n2 if graph.has_edge(u, v)]
+    possible_connections.remove((v1,v2)) # remove previous connection
+
+    if possible_connections == []:
+        tree.add_edge(v1, v2) # no changes
+    else:
+        edge = choice(possible_connections)
+        tree.add_edge(edge[0], edge[1]) # new node
+""" 
+Find common edges in both trees. Find largest connected subgraph in resulting graph.
+Build the rest of the graph using random walk.
+"""
+def crossover(t1, t2, graph):
+    # here we get from |V-1| edges (when two graphs are identical) 
+    # to minimum 1 common edge
+    forest = nx.intersection(t1,t2) 
+    # we select the largest resulting subgraph
+    offspring = nx.connected_component_subgraphs(forest)[0]
+
+    # using largest common subgraph of two spanning trees grow the rest of tree using random walk
+    Tree = set()
+    Next = { }
+    Tree.update(offspring.nodes())
+    for i in offspring.nodes():
+        Next[i] = None
+
+    for i in graph.nodes():
+        u = i
+        while u not in Tree:
+            Next[u] = choice(graph.neighbors(u))
+            u = Next[u]
+
+        u = i
+
+        while u not in Tree:
+            Tree.add(u)
+            u = Next[u]
+
+    for u,v in Next.items():
+        if v != None:
+            offspring.add_edge(u,v)
+
+    return offspring
+      
 if __name__ == '__main__':
-    g = Graph("benchmark/n030d100C010c001Q010q001s-3i1.txt")
-    state = SpanningTree(g)
+    g = Graph("benchmark/n010d100C010c001Q010q001s-3i1.txt")
+    def energy(tree):
+        return getCost(tree, g.q, g.v2e)
 
-    annealer = Annealer(energy, move)
-    schedule = annealer.auto(state, minutes=1)
-    state, e = annealer.anneal(state, schedule['tmax'], schedule['tmin'],  schedule['steps'], updates=6)
-    print(state.getCost())
+    def move(tree):
+        mutation(tree, g.c)
+
+    tree = generateRandomSpanningTree(g.c)
+    tree1 = generateRandomSpanningTree(g.c)
+
+    tree2 = crossover(tree, tree1, g.c)
+
+    print(getCost(tree, g.q,g.v2e))
+    print(getCost(tree1, g.q,g.v2e))
+    print(getCost(tree2, g.q,g.v2e))
+    
+    
+
+    
 
 
     
