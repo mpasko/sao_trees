@@ -59,7 +59,7 @@ class Genetic:
             if (self.should_do_crossover()):
                 new_individual = self.perform_crossover(parent1,parent2)
             else:
-                new_invidual = Individual(parent1.chromosome, self.target_fun)
+                new_individual = Individual(parent1.chromosome, self.target_fun)
 
             new_generation.append(new_individual)
 
