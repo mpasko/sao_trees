@@ -1,8 +1,8 @@
 from random import choice, shuffle
 from re import split
-from anneal import Annealer
 import numpy as np
 import networkx as nx
+import matplotlib.pyplot as plt
 
 class Graph:
     """Graph data loaded from file"""       
@@ -146,12 +146,21 @@ if __name__ == '__main__':
 
     def move(tree):
         mutation(tree, g.c)
+    
 
+    plt.figure()
     tree = generateRandomSpanningTree(g.c)
+    nx.draw_circular(tree)
+    plt.show()
     tree1 = generateRandomSpanningTree(g.c)
-
+    plt.figure()
+    nx.draw_circular(tree1  )
+    plt.show()
+    
     tree2 = crossover(tree, tree1, g.c)
-
+    plt.figure()
+    nx.draw_circular(tree2)
+    plt.show()
     print(getCost(tree, g.q,g.v2e))
     print(getCost(tree1, g.q,g.v2e))
     print(getCost(tree2, g.q,g.v2e))

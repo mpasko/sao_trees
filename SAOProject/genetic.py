@@ -4,11 +4,12 @@ from random import *
 seed(None)
 
 class Individual:
-    def __init__(self,chromosome):
-        self.fitness = 0.0
+    def __init__(self,chromosome, target_fun):
+        self.fitness = target_fun(chromosome)
         self.chromosome = chromosome
     def __str__(self):
-        return "fitness:"+ str(self.fitness)+" chromosome:"+ str(self.chromosome)
+        return "fitness:"+ str(self.fitness)+ " chromosome:" + str(self.chromosome)
+
         
 
 class Genetic:
@@ -18,63 +19,51 @@ class Genetic:
         self.mutat_fun = mutation_function
         self.population = population
         self.crossover_prob = 0.5
-#        self.mutation_prob = 0.01
-        self.__cross_last_done=False
+        self.mutation_prob = 0.01
+
         for ind in self.population:
             ind.fitness=target_function(ind.chromosome)
     
     def select(self):
-        sum=0.0
-        for ind in self.population:
-            sum+=ind.fitness
-        rand = uniform(0, sum)
-        current=0.0
-        index=0
-        while (current<= rand) and index<len(self.population)-1:
-            current+=self.population[index].fitness
-            index+=1
-        return index
+        rand = uniform(0, sum([ ind.fitness for ind in self.population ]))
+
+        current = 0.0
+        i=0
+        while ((current + self.population[i].fitness) <= rand) and i<len(self.population):
+            current+=self.population[i].fitness
+            i+=1
+
+        return i
         
     def should_do_sth(self, prob):
-        randnum=uniform(0.0,1.0)
-        return (randnum <= prob)
+        return (uniform(0.0,1.0) <= prob)
     
     def should_do_mutation(self):
-        return not self.__cross_last_done
+        return self.should_do_sth(self.mutation_prob)
         
     def should_do_crossover(self):
-        self.__cross_last_done = self.should_do_sth(self.crossover_prob)
-        return self.__cross_last_done
+        return self.should_do_sth(self.crossover_prob)
         
     def perform_crossover(self, x, y):
-        x_chr = x.chromosome
-        y_chr = y.chromosome
-        new_ind=None
-        if self.should_do_crossover():
-            new_chr = self.cross_fun(x_chr,y_chr)
-            new_ind = Individual(new_chr)
-            new_ind.fitness = self.target_fun(new_chr)
-        else:
-            #we gotta bloody week -no crossover! ;(
-            new_ind = Individual(x_chr)
-            #to save one calculation we copy fitness ;)
-            new_ind.fitness = x.fitness
-        return new_ind
+        new_chr = self.cross_fun(x.chromosome,y.chromosome)
+        return Individual(new_chr, self.target_fun)
         
     def generation(self):
         new_generation = []
         total = len(self.population)
+
         for x in range(0,total):
             parent1 = self.population[self.select()]
             parent2 = self.population[self.select()]
-            new_individual = self.perform_crossover(parent1,parent2)
-            if self.should_do_mutation():
-                new_chr = self.mutat_fun(new_individual.chromosome)
-                new_fit = self.target_fun(new_chr)
-                new_individual.chromosome=new_chr
-                new_individual.fitness=new_fit
+            new_individual = None
+            if (self.should_do_crossover()):
+                new_individual = self.perform_crossover(parent1,parent2)
+            else:
+                new_invidual = Individual(parent1.chromosome, self.target_fun)
+
             new_generation.append(new_individual)
-        self.population = new_generation
+
+        self.population = [ Individual(self.mutat_fun(i.chromosome), self.target_fun) for i in new_generation if self.should_do_mutation() ]
         
     def generations(self, iterations):
         for x in range(0, iterations):
