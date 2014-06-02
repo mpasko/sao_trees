@@ -28,10 +28,10 @@ if __name__ == '__main__':
         popul.append(ind)
         print(str(ind))
     
-    gen=Genetic(popul,fun,crossover,mutation)
+    gen=Genetic("test",popul,fun,crossover,mutation)
     #every problem must have its own configuration
     gen.crossover_prob = 0.8
-    gen.generations(200)
+    gen.generations(50)
     print("Result: (size ",len(gen.population), ")")
     for ind in gen.population:
         ind.fitness = fun(ind.chromosome)

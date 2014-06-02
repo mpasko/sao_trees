@@ -93,24 +93,24 @@ def mutation(tree, graph):
     n1 = nx.dfs_tree(tree, v1).nodes()
     n2 = nx.dfs_tree(tree, v2).nodes()
 
-
     # we list possible candidates for new connection
     possible_connections = [(u,v) for u in n1 for v in n2 if graph.has_edge(u, v)]
-    possible_connections.remove((v1,v2)) # remove previous connection
 
     if possible_connections == []:
         tree.add_edge(v1, v2) # no changes
     else:
+        possible_connections.remove((v1,v2)) # remove previous connection
         edge = choice(possible_connections)
         tree.add_edge(edge[0], edge[1]) # new node
 """ 
 Find common edges in both trees. Find largest connected subgraph in resulting graph.
 Build the rest of the graph using random walk.
 """
+#@profile
 def crossover(t1, t2, graph):
     # here we get from |V-1| edges (when two graphs are identical) 
     # to minimum 1 common edge
-    forest = nx.intersection(t1,t2) 
+    forest = nx.intersection(t1,t2)
     # we select the largest resulting subgraph
     offspring = nx.connected_component_subgraphs(forest)[0]
 
