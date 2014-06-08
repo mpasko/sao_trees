@@ -6,7 +6,7 @@ if __name__ == '__main__':
     # Create graph
     g = Graph("benchmark/n010d100C010c001Q010q001s-3i1.txt")
     population_size=10
-    generations=40
+    generations=20
     crossover_prob=0.4
     mutation_prob=0.1
     

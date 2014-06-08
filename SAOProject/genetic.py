@@ -77,7 +77,7 @@ class BasicGenetic:
     def should_crossover(self):
         return uniform(0.0,1.0) <= self.crossover_prob
         
-    @profile
+  #  @profile
     def generation(self):
         new_generation = []
         total = len(self.population)
@@ -92,7 +92,7 @@ class BasicGenetic:
                 fitness = self.target_fun(new_chr)
                 new_generation.append(Individual(new_chr, fitness))
             else:
-                new_generation.append(Individual(p1.chromosome.copy(), p1.fitness))
+                new_generation.append(Individual(p1.chromosome, p1.fitness))
 
         # mutation phase
         self.population = []
@@ -103,7 +103,7 @@ class BasicGenetic:
                 fitness = self.target_fun(new_chr)
                 self.population.append(Individual(new_chr, fitness))
             else:
-                self.population.append(Individual(i.chromosome.copy(), i.fitness))
+                self.population.append(Individual(i.chromosome, i.fitness))
 
         
     def generations(self, iterations):

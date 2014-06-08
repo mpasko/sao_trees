@@ -24,11 +24,11 @@ if __name__ == '__main__':
     popul=[]
     for x in range(0, 100):
         val = randint(0,100)
-        ind = Individual(val,fun)
+        ind = Individual(val,fun(val))
         popul.append(ind)
         print(str(ind))
     
-    gen=Genetic("test",popul,fun,crossover,mutation)
+    gen=BasicGenetic("test",popul,fun,crossover,mutation)
     #every problem must have its own configuration
     gen.crossover_prob = 0.8
     gen.generations(50)
