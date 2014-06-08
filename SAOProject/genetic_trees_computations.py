@@ -7,7 +7,7 @@ if __name__ == '__main__':
     # Create graph
     g = Graph("benchmark/n010d100C010c001Q010q001s-3i1.txt")
     population_size=10
-    generations=20
+    generations=40
     crossover_prob=0.4
     mutation_prob=0.1
     
@@ -17,7 +17,7 @@ if __name__ == '__main__':
         return 1/getCost(tree, g.q, g.v2e)
         
     def energy_pression(tree):
-        cost=getCost(tree, g.q, g.v2e)
+        cost = getCost(tree, g.q, g.v2e)
         return 1/(cost**2);
 
     def move(tree):
@@ -36,7 +36,7 @@ if __name__ == '__main__':
         population=[]
         for x in range(0, population_size):
             tree = generateRandomSpanningTree(g.c)
-            ind = Individual(tree,energy)
+            ind = Individual(tree,energy(tree))
             population.append(ind)
         return population
         

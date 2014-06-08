@@ -1,19 +1,9 @@
 
 from random import *
 from logging import *
-#from guppy import hpy
 import os, os.path
-import gc
 
-#profiler = hpy()
-prof_log=getLogger("Memory")
-prof_log.addHandler(FileHandler('memory.log'))
-prof_log.setLevel(INFO)
 
-def dump_memory():
-    global prof_log
-    global profiler
-#    prof_log.info(profiler.heap())
 
 def prepare_logger(problem_name):
     dir_name='log_archive'
@@ -23,7 +13,7 @@ def prepare_logger(problem_name):
     except OSError:
         number=1+len([fil for fil in os.listdir(dir_name+"/") if os.path.isfile(dir_name+"/"+fil)])
     filename=dir_name+'/'+problem_name+str(number)+'.log'
-    print "writing to: ",filename
+    print ("writing to: ",filename)
     log = getLogger("Genetics")
     log.addHandler(FileHandler(filename))
     log.setLevel(INFO)
@@ -32,8 +22,8 @@ def prepare_logger(problem_name):
 seed(None)
 
 class Individual:
-    def __init__(self,chromosome, target_fun):
-        self.fitness = target_fun(chromosome)
+    def __init__(self,chromosome, fitness):
+        self.fitness = fitness
         self.chromosome = chromosome
     def __str__(self):
         return "fitness:"+ str(self.fitness)+ " chromosome:" + str(self.chromosome)
@@ -50,9 +40,6 @@ class Genetic:
         self.log = prepare_logger(name)
         self.crossovers_performed=0
         self.mutations_performed=0
-
-        for ind in self.population:
-            ind.fitness=target_function(ind.chromosome)
     
     def statistics(self):
         max_fit=-1.0
@@ -72,59 +59,57 @@ class Genetic:
         self.log.info("Crossovers_performed:"+str(self.crossovers_performed))
         self.log.info("Mutations_performed:"+str(self.mutations_performed))
     
-    def select(self):
-        rand = uniform(0, sum([ ind.fitness for ind in self.population ]))
+
+    # select random individual from population
+    # proportionally to its fitness, aka roulette wheel selection
+    def roulette_selection(self):
+        rand = uniform(0, sum([ ind.fitness for ind in self.population]))
         current = 0.0
         i=0
         while ((current + self.population[i].fitness) <= rand) and i<len(self.population):
             current+=self.population[i].fitness
             i+=1
-        return i
+        return self.population[i]
+           
+    def should_mutation(self):
+        return uniform(0.0,1.0) <= self.mutation_prob
         
-    def should_do_sth(self, prob):
-        return (uniform(0.0,1.0) <= prob)
-    
-    def should_do_mutation(self):
-        return self.should_do_sth(self.mutation_prob)
+    def should_crossover(self):
+        return uniform(0.0,1.0) <= self.crossover_prob
         
-    def should_do_crossover(self):
-        return self.should_do_sth(self.crossover_prob)
-        
-    def perform_crossover(self, x, y):
-        new_chr = self.cross_fun(x.chromosome,y.chromosome)
-        return Individual(new_chr, self.target_fun)
-    
-#    @profile
+    @profile
     def generation(self):
         new_generation = []
         total = len(self.population)
 
+        # crossover phase
         for x in range(0,total):
-            parent1 = self.population[self.select()]
-            parent2 = self.population[self.select()]
-            new_individual = None
-            if (self.should_do_crossover()):
+            p1, p2 = self.roulette_selection(), self.roulette_selection()
+
+            if (self.should_crossover()):
                 self.crossovers_performed+=1
-                new_individual = self.perform_crossover(parent1,parent2)
-                gc.collect(2)
+                new_chr = self.cross_fun(p1.chromosome,p2.chromosome)
+                fitness = self.target_fun(new_chr)
+                new_generation.append(Individual(new_chr, fitness))
             else:
-                new_individual = Individual(parent1.chromosome, self.target_fun)
+                fitness = self.target_fun(p1.chromosome)
+                new_generation.append(Individual(p1.chromosome, fitness))
 
-            new_generation.append(new_individual)
-
+        # mutation phase
         self.population = []
         for i in new_generation:
-            if self.should_do_mutation():
+            if self.should_mutation():
                 self.mutations_performed+=1
-                self.population.append(Individual(self.mutat_fun(i.chromosome), self.target_fun))
+                new_chr = self.mutat_fun(i.chromosome)
+                fitness = self.target_fun(new_chr)
+                self.population.append(Individual(new_chr, fitness))
             else:
-                self.population.append(Individual(i.chromosome, self.target_fun))
-        new_generation=[] #for memory optimization purpose
+                fitness = self.target_fun(i.chromosome)
+                self.population.append(Individual(i.chromosome, fitness))
+
         
     def generations(self, iterations):
         for x in range(0, iterations):
             self.log.info("Producing generation number:"+str(x))
             self.generation()
-            gc.collect(2)
             self.statistics()
-            dump_memory()
