@@ -137,7 +137,11 @@ def crossover(t1, t2, graph):
         if v != None:
             offspring.add_edge(u,v)
 
-    return offspring
+    g = nx.Graph()
+    for edge in offspring.edges_iter():
+        g.add_edge(edge[0], edge[1])
+
+    return g
       
 if __name__ == '__main__':
     g = Graph("benchmark/n010d100C010c001Q010q001s-3i1.txt")

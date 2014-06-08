@@ -22,8 +22,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="anneal.py" />
     <Compile Include="evolution.py" />
     <Compile Include="genetic.py" />
+    <Compile Include="genetic_trees_computations.py" />
     <Compile Include="test.py" />
     <Compile Include="trees.py" />
   </ItemGroup>
@@ -414,6 +416,7 @@
     <Content Include="Documents\IISExpress\TraceLogFiles\Sybilla.MobotixWebViewer\fr000324.xml" />
     <Content Include="Documents\IISExpress\TraceLogFiles\Sybilla.MobotixWebViewer\fr000325.xml" />
     <Content Include="Documents\IISExpress\TraceLogFiles\Sybilla.MobotixWebViewer\freb.xsl" />
+    <Content Include="processing_data.sh" />
     <Content Include="readme.md" />
   </ItemGroup>
   <ItemGroup>
