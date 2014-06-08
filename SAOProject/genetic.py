@@ -26,10 +26,10 @@ class Individual:
         self.fitness = fitness
         self.chromosome = chromosome
     def __str__(self):
-        return "fitness:"+ str(self.fitness)+ " chromosome:" + str(self.chromosome)
+        return "fitness:" + str(self.fitness)+ " chromosome:" + str(self.chromosome)
 
 
-class Genetic:
+class BasicGenetic:
     def __init__(self, name, population, target_function, crossover_function, mutation_function, crossover_prob = 0.05, mutation_prob = 0.01):
         self.target_fun = target_function
         self.cross_fun = crossover_function
@@ -53,9 +53,9 @@ class Genetic:
             if fit < min_fit:
                 min_fit=fit
             sum_fit+=fit
-        self.log.info("Min_fitness:"+str(min_fit))
+        self.log.info("Min_fitness:"+str(1/min_fit))
         self.log.info("Average_fitness:"+str(sum_fit/len(self.population)))
-        self.log.info("Max_fitness:"+str(max_fit))
+        self.log.info("Max_fitness:"+str(1/max_fit))
         self.log.info("Crossovers_performed:"+str(self.crossovers_performed))
         self.log.info("Mutations_performed:"+str(self.mutations_performed))
     
@@ -92,8 +92,7 @@ class Genetic:
                 fitness = self.target_fun(new_chr)
                 new_generation.append(Individual(new_chr, fitness))
             else:
-                fitness = self.target_fun(p1.chromosome)
-                new_generation.append(Individual(p1.chromosome, fitness))
+                new_generation.append(Individual(p1.chromosome.copy(), p1.fitness))
 
         # mutation phase
         self.population = []
@@ -104,8 +103,7 @@ class Genetic:
                 fitness = self.target_fun(new_chr)
                 self.population.append(Individual(new_chr, fitness))
             else:
-                fitness = self.target_fun(i.chromosome)
-                self.population.append(Individual(i.chromosome, fitness))
+                self.population.append(Individual(i.chromosome.copy(), i.fitness))
 
         
     def generations(self, iterations):

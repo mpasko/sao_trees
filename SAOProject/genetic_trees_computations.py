@@ -1,7 +1,6 @@
 from trees import *
 from genetic import *
 import matplotlib.pyplot as plt
-import copy
 
 if __name__ == '__main__':
     # Create graph
@@ -41,14 +40,17 @@ if __name__ == '__main__':
         return population
         
     population=create_population()
-    gen=Genetic("simple_genetic",population,energy,pleasure,move,crossover_prob,mutation_prob)
+    gen=BasicGenetic("simple_genetic",population,energy,pleasure,move,crossover_prob,mutation_prob)
     gen.generations(generations)  
     for ind in gen.population:
-        ind.fitness = energy(ind.chromosome)
+        ind.fitness = getCost(ind.chromosome,g.q, g.v2e)
         print(ind.fitness)
+
+
+
     population=create_population()
-    gen=Genetic("pression_genetic",population,energy_pression,pleasure,move,crossover_prob,mutation_prob)
+    gen=BasicGenetic("pression_genetic",population,energy_pression,pleasure,move,crossover_prob,mutation_prob)
     gen.generations(generations) 
     for ind in gen.population:
-        ind.fitness = energy(ind.chromosome)
+        ind.fitness = getCost(ind.chromosome,g.q, g.v2e)
         print(ind.fitness)
