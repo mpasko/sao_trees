@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
     # Create graph
     g = Graph("benchmark/n010d100C010c001Q010q001s-3i1.txt")
-    population_size=10
-    generations=20
+    population_size=100
+    generations=200
     crossover_prob=0.4
     mutation_prob=0.1
     
@@ -39,18 +39,31 @@ if __name__ == '__main__':
             population.append(ind)
         return population
         
-    population=create_population()
-    gen=BasicGenetic("simple_genetic",population,energy,pleasure,move,crossover_prob,mutation_prob)
-    gen.generations(generations)  
-    for ind in gen.population:
-        ind.fitness = getCost(ind.chromosome,g.q, g.v2e)
-        print(ind.fitness)
+    def simple_genetic():
+        population=create_population()
+        gen=BasicGenetic("simple_genetic",population,energy,pleasure,move,crossover_prob,mutation_prob)
+        gen.generations(generations)  
+        for ind in gen.population:
+            ind.fitness = getCost(ind.chromosome,g.q, g.v2e)
+            print(ind.fitness)
 
-
-
-    population=create_population()
-    gen=BasicGenetic("pression_genetic",population,energy_pression,pleasure,move,crossover_prob,mutation_prob)
-    gen.generations(generations) 
-    for ind in gen.population:
-        ind.fitness = getCost(ind.chromosome,g.q, g.v2e)
-        print(ind.fitness)
+    def pression_genetic():
+        population=create_population()
+        gen=BasicGenetic("pression_genetic",population,energy_pression,pleasure,move,crossover_prob,mutation_prob)
+        gen.generations(generations) 
+        for ind in gen.population:
+            ind.fitness = getCost(ind.chromosome,g.q, g.v2e)
+            print(ind.fitness)
+        
+    def tournament_genetic():
+        population=create_population()
+        gen=BasicGenetic("tournament_genetic",population,energy,pleasure,move,crossover_prob,mutation_prob)
+        gen.selection='tournament'
+        gen.generations(generations)  
+        for ind in gen.population:
+            ind.fitness = getCost(ind.chromosome,g.q, g.v2e)
+            print(ind.fitness)
+            
+#    simple_genetic()
+#   pression_genetic()
+    tournament_genetic()
