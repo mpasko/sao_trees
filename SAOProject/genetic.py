@@ -40,6 +40,11 @@ class BasicGenetic:
         self.log = prepare_logger(name)
         self.crossovers_performed=0
         self.mutations_performed=0
+        """ Probability that we take the best in tournament selection """
+        self.first_win_prob=0.4
+        """ It is tournament size as percentage of whole population """
+        self.tournament_percentage=0.3
+        self.selection = 'roulette'
     
     def statistics(self):
         max_fit=-1.0
@@ -70,6 +75,22 @@ class BasicGenetic:
             current+=self.population[i].fitness
             i+=1
         return self.population[i]
+        
+    def tournament_selection(self):
+        size = int(len(self.population) * self.tournament_percentage)
+        total = len(self.population)
+        # Random some subset of population
+        tournament = [self.population[randint(0,total-1)] for x in range(0, size-1)]
+        # Sort it descending
+        sortedT = sorted(tournament, key=lambda ind: ind.fitness, reverse=True)
+        # Probability that we keep first element
+        cond = (uniform(0.0,1.0) <= self.first_win_prob)
+        index = 0;
+        while (not cond) and index<size:
+            # If not we get next and next and et caetera...
+            cond = (uniform(0.0,1.0) <= self.first_win_prob)
+            index=index+1
+        return sortedT[index]
            
     def should_mutation(self):
         return uniform(0.0,1.0) <= self.mutation_prob
@@ -84,7 +105,12 @@ class BasicGenetic:
 
         # crossover phase
         for x in range(0,total):
-            p1, p2 = self.roulette_selection(), self.roulette_selection()
+            p1, p2 = [], []
+            if self.selection == 'roulette':
+                p1, p2 = self.roulette_selection(), self.roulette_selection()
+            else:
+                p1, p2 = self.tournament_selection(), self.tournament_selection()
+                
 
             if (self.should_crossover()):
                 self.crossovers_performed+=1
