@@ -24,7 +24,11 @@ if __name__ == '__main__':
     popul=[]
     for x in range(0, 100):
         val = randint(0,100)
+<<<<<<< HEAD
         ind = Individual(val,fun)
+=======
+        ind = Individual(val,fun(val))
+>>>>>>> a101bed2cad65208cb7ccb4fe384e451464539c4
         popul.append(ind)
         print(str(ind))
     
