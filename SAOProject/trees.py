@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 from random import choice, shuffle, uniform
-=======
-from random import choice, shuffle
->>>>>>> a101bed2cad65208cb7ccb4fe384e451464539c4
 from re import split
 import numpy as np
 import networkx as nx
@@ -114,7 +110,6 @@ Build the rest of the graph using random walk.
 def crossover(t1, t2, graph):
     # here we get from |V-1| edges (when two graphs are identical) 
     # to minimum 1 common edge
-<<<<<<< HEAD
     edges = nx.compose(t1,t2).edges()
     shuffle(edges)
     # we select the largest resulting subgraph
@@ -130,38 +125,6 @@ def crossover(t1, t2, graph):
     if uniform(0,1) <= 0.25:        
         if nx.intersection(t1,t2).size() ==  t1.size():
             mutation(g, graph)
-=======
-    forest = nx.intersection(t1,t2)
-    # we select the largest resulting subgraph
-    offspring = nx.connected_component_subgraphs(forest)[0]
-
-    # using largest common subgraph of two spanning trees grow the rest of tree using random walk
-    Tree = set()
-    Next = { }
-    Tree.update(offspring.nodes())
-    for i in offspring.nodes():
-        Next[i] = None
-
-    for i in graph.nodes():
-        u = i
-        while u not in Tree:
-            Next[u] = choice(graph.neighbors(u))
-            u = Next[u]
-
-        u = i
-
-        while u not in Tree:
-            Tree.add(u)
-            u = Next[u]
-
-    for u,v in Next.items():
-        if v != None:
-            offspring.add_edge(u,v)
-
-    g = nx.Graph()
-    for edge in offspring.edges_iter():
-        g.add_edge(edge[0], edge[1])
->>>>>>> a101bed2cad65208cb7ccb4fe384e451464539c4
 
     return g
       
@@ -183,16 +146,6 @@ if __name__ == '__main__':
     nx.draw_circular(tree1  )
     plt.show()
     
-<<<<<<< HEAD
-    mutation(tree, g.c)
-    plt.figure()
-    nx.draw_circular(tree)
-=======
-    tree2 = crossover(tree, tree1, g.c)
-    plt.figure()
-    nx.draw_circular(tree2)
->>>>>>> a101bed2cad65208cb7ccb4fe384e451464539c4
-    plt.show()
     print(getCost(tree, g.q,g.v2e))
     print(getCost(tree1, g.q,g.v2e))
     print(getCost(tree2, g.q,g.v2e))

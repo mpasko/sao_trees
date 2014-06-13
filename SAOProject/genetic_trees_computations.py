@@ -1,10 +1,7 @@
 from trees import *
 from genetic import *
 import matplotlib.pyplot as plt
-<<<<<<< HEAD
 import copy
-=======
->>>>>>> a101bed2cad65208cb7ccb4fe384e451464539c4
 
 if __name__ == '__main__':
     # Create graph
@@ -62,11 +59,8 @@ if __name__ == '__main__':
     def tournament_genetic():
         population=create_population()
         gen=BasicGenetic("tournament_genetic",population,energy,pleasure,move,crossover_prob,mutation_prob)
-<<<<<<< HEAD
         gen.tournament_percentage = 0.25
         gen.first_win_prob = 0.33
-=======
->>>>>>> a101bed2cad65208cb7ccb4fe384e451464539c4
         gen.selection='tournament'
         gen.generations(generations)  
         for ind in gen.population:
