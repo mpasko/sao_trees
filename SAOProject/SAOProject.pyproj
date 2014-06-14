@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>04dd5615-4e76-49a2-844a-713b681a673b</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>evolution.py</StartupFile>
+    <StartupFile>evolution_suite.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Include="anneal.py" />
     <Compile Include="evolution.py" />
+    <Compile Include="evolution_suite.py" />
     <Compile Include="genetic.py" />
     <Compile Include="genetic_trees_computations.py" />
     <Compile Include="test.py" />

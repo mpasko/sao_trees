@@ -58,13 +58,14 @@ def merge_handlers(handlers):
 
 def logging_observer_factory(logger):
     def logging_observer(population, num_generations, num_evaluations, args):
-        best = population[0].fitness
-        worst = population[len(population)-1].fitness
+        best = max(population)
+        worst = min(population)
+   
         sum=0.0
         for individual in population:
             sum+=individual.fitness
         average=sum/float(len(population))
-        logger.info(Record(worst,best,average,num_evaluations))
+        logger.info(Record(worst.fitness,best.fitness,average,num_evaluations))
     return logging_observer
 
 def customized_replacer(random, population, parents, offspring, args):
