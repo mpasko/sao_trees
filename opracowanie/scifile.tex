@@ -128,7 +128,97 @@
 
 
 
-\section*{Sformułowanie porblemu}
+
+\section{Sformułowanie problemu}
+
+Niech $G =(V,E)$ bedzie nieskierowanym grafem ze zbiorem wierzcholkow V i zbiorem krawedzi E. Problem kwadratowego minimalnego drzewa rozpinajacego (QMSTP, quadratic minimum spanning tree). Kazda krawedz posiada przypisany koszt $e_{g}$ oraz każda para krawedzi posiada koszt $c_{eg}$. Minimalizowany koszt drzewa rozpinajacego $T= (V, E(T))$ jest wyrazony:
+$$ F(T) = \sum_{e \in E(T) } c_e + \sum_{(e,g) \in \Psi (T)} c_{eg} $$
+
+ $\Psi (T)$ oznacza zbior wszystkich par krawedzi znajdujacych sie w drzewie $T$. Rozwiazania QMSTP znajduja zastosowanie w telekomunikacji, logistyce i dystrybucji energii.
+ 
+ Problem QMST jest NP-trudny \cite{Assad}, przez co optymalny algorytm rozwiazujacy go w czasie wielomianowym istnieje tylko jesli $P=NP$. Uzasadnione jest wiec wykorzystanie do znalezienia rozwiazania jednej z wielu dostepnych metaheurystyk.
+ 
+ \section{Wykorzystana metaheurystyka}
+
+Zastosowanie regul zaczerpnietych z procesow ewolucyjnych jest powszechnie stosowana praktyka podczas rozwiazywania problemow ewolucyjnych. Na potrzeby naszego projektu wykorzystalismy algorytm genetyczny jako matryce do stworzenia wlasciwego algorytmu. W trakcie rozwiazywania QMSTP utrzymujemy populacje rozwiazan, gdzie pojedynczy osobnik stanowi pojedyncze drzewo rozpinajace w grafie $G$. Reprezentowany jest w postaci grafu odpowiadajacego liscie krawedzi z oryginalnego grafu. Korzystajac z wzoru na koszt drzewa rozpinajacego ustalana jest jakosc rozwiazania. Nastepnie droga selekcji turniejowej wybierane sa rozwiazania do krzyzowania. Rozwiazania powstale wskutek krzyzowania zamieniaja najslabsze rozwiazania z populacji. Oprocz krzyzowania rozwiazania z pewnym prawdopodbienstwem poddawane sa operacji losowej mutacji.
+
+
+W celu ustalenia poczatkowej populacji konieczne jest wygenerowanie losowych grafow bedacych drzewami rozpinajacymi (niekoniecznie losowymi). Wazne jest aby rozklad z ktorego losowane sa drzewa rozpinajace byl rozkladem jednostajnym, dzieki czemu mozliwe bedzie przeszukiwanie przestrzeni rozwiazan bez uprzywilejowanego traktowania czesci rozwiazan. Losowe drzewo rozpinajace uzyskuje sie rozpoczynajac bladzenie losowe zaczynajac od losowego wierzcholka. 
+
+\begin{figure}[h!]
+ \centering
+\begin{algorithmic}
+\Function{RandomTree}{} 
+\State $r\gets \Call{RandomVertex}{nil}$
+\For{ $i < n$} 
+	\State $InTree[i] \gets false $
+	\State $i\gets i+1$
+\EndFor
+\State $Next[r] \gets nil $
+\State $InTree[r] \gets true $
+
+
+\For{ $i < n$} 
+	\State $u \gets 1 $
+    \While{not InTree[u]} 
+    	\State $Next[u] \gets \Call{RandomSuccessor}{u}$
+        \State $u \gets Next[u]$
+    \EndWhile
+    \State $u\gets i$
+    \While{not InTree[u]} 
+    	\State $InTree[u] \gets true$
+        \State $u \gets Next[u]$
+    \EndWhile
+    
+	\State $i\gets i+1$
+\EndFor
+
+
+\Return Next
+
+\EndFunction
+
+\end{algorithmic}
+\caption{Algorytm generujacy losowe drzewo rozpinajace}
+\end{figure}
+
+
+
+
+
+W projekcie wykorzystano rowniez mechanizmy zaczerpniete z algorytmu symulowanego wyzarzania. Jest to algorytm wzorowany procesie wyzarzania stosowanego w metalurgii. Opiera sie ono o stopniowym, kontrolowanym zmniejszaniu temperatury metalu celem optymalizacji (minimalizacji) energii swobodnej materialu. Opierajac sie na tym mechanizmie, czesc parametrow procesu ewolucyjnego rowniez podlega procesowi powolnej zmiany wedlug ustalonego planu, naleza do nich:
+
+\begin{itemize}
+  \item prawdopodobienstwo mutacji
+  \item wielkosc turnieju
+  \item The third etc \ldots
+\end{itemize}
+
+
+
+
+ \section{Zbior testowy i wyniki}
+
+
+ Do testow wykorzystano benchmark udstepniony przez Roberto Cordone. Zawiera on zbior grafow rozniacych sie od siebie:
+ 
+ \begin{itemize}
+  \item iloscia wierzcholkow (od 10 do 50 wierzchołków)
+  \item gestoscia grafow ($\frac{1}{3}, \frac{2}{3}, 1$)
+  \item zakresem kosztow krawedzi i kosztow pomiedzy parami krawedzi (dwa dyskretne zakresy: 1-10,1-100) 
+\end{itemize}
+
+Do testow zostaly wybrane 3 grafy odpowiednio z: 10, 15 i 20 wierzcholkami. Wszystkie grafy sa grafami pelnymi oraz wartosci kosztow znajduja sie w wiekszym zakresie: 1-100. Dysponujemy dla nich rowniez najlepszymi uzyskanymi rezultatami, odpowiednio: 2197, 5879 i 11101.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Assad}
+  A. Assad, W. Xu,
+  \emph{The quadratic minimum spanning tree problem.}.
+  Naval Research Logistics, 1992,Vol.39, 399–417.
+
+\end{thebibliography}
 
 
 \input{results.tex}
