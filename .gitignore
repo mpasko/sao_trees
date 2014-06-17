@@ -159,3 +159,7 @@ $RECYCLE.BIN/
 benchmark/
 DataQMST10-30.zip
 DataQMST35-50.zip
+# Tex files
+opracowanie/*.log
+opracowanie/*.aux
+opracowanie/*.pdf
