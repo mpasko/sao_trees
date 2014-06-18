@@ -130,23 +130,29 @@
 
 \section*{Sformułowanie problemu}
 
-
-
-
-
-Niech $G =(V,E)$ będzie nieskierowanym grafem ze zbiorem wierzchołków V i zbiorem krawędzi E. Problem kwadratowego minimalnego drzewa rozpinającego (QMSTP, quadratic minimum spanning tree) w którym każda krawędź posiada przypisany koszt $e_{g}$ oraz każda para krawędzi posiada koszt $c_{eg}$ i minimalizowany koszt drzewa rozpinającego $T= (V, E(T))$ jest wyrazony:
+Problem został po raz pierwszy sformułowany przez Assad i Xu \Cite{Assad}. Niech $G =(V,E)$ będzie nieskierowanym grafem ze zbiorem wierzchołków V i zbiorem krawędzi E. Problem kwadratowego minimalnego drzewa rozpinającego (QMSTP, quadratic minimum spanning tree) w którym każda krawędź posiada przypisany koszt $e_{g}$ oraz każda para krawędzi posiada koszt $c_{eg}$ i minimalizowany koszt drzewa rozpinającego $T= (V, E(T))$ jest wyrazony:
 $$ F(T) = \sum_{e \in E(T) } c_e + \sum_{(e,g) \in \Psi (T)} c_{eg} $$
 
  $\Psi (T)$ oznacza zbiór wszystkich par krawędzi znajdujących sie w drzewie $T$. Rozwiązania QMSTP znajdują zastosowanie w telekomunikacji, logistyce i dystrybucji energii.
  
  Problem QMST jest NP-trudny \cite{Assad}, przez co optymalny algorytm rozwiązujący go w czasie wielomianowym istnieje tylko jesli $P=NP$. Uzasadnione jest wiec wykorzystanie do znalezienia rozwiązania jednej z wielu dostępnych metaheurystyk.
  
+ 
+ \section{State of the art}
+ 
+ Do rozwiązania problemu QMST wykorzystywano:
+ \begin{itemize}
+  \item ABC: An artificial bee colony method combined with a local search procedure \Cite{Sundar}
+  \item ITS: Iterated tabu search that alternates tabu search with perturbation procedures. 
+  \item LS-TT: A local search algorithm with tabu thresholding. Öncan and Punnen \Cite{Oncan}
+\end{itemize}
+ 
  \section{Wykorzystana metaheurystyka}
 
-Zastosowanie reguł zaczerpniętych z procesów ewolucyjnych jest powszechnie stosowana praktyka podczas rozwiązywania problemów ewolucyjnych. Na potrzeby naszego projektu wykorzystaliśmy algorytm genetyczny jako matryce do stworzenia właściwego algorytmu. W trakcie rozwiązywania QMSTP utrzymujemy populacje rozwiązań, gdzie pojedynczy osobnik stanowi pojedyncze drzewo rozpinające w grafie $G$. Reprezentowany jest w postaci grafu odpowiadającego liście krawędzi z oryginalnego grafu. Korzystając z wzoru na koszt drzewa rozpinającego ustalana jest jakość rozwiązania. Następnie droga selekcji turniejowej wybierane są rozwiązania do krzyżowania. Rozwiązania powstałe wskutek krzyżowania zamieniają najsłabsze rozwiązania z populacji. Oprócz krzyżowania rozwiązania z pewnym prawdopodobieństwem poddawane są operacji losowej mutacji.
+Zastosowanie reguł zaczerpniętych z procesów ewolucyjnych jest powszechnie stosowana praktyka podczas rozwiązywania problemów ewolucyjnych. Na potrzeby naszego projektu wykorzystaliśmy algorytm genetyczny jako matryce do stworzenia właściwego algorytmu \Cite{Inspyred}. W trakcie rozwiązywania QMSTP utrzymujemy populacje rozwiązań, gdzie pojedynczy osobnik stanowi pojedyncze drzewo rozpinające w grafie $G$. Reprezentowany jest w postaci grafu odpowiadającego liście krawędzi z oryginalnego grafu. Korzystając z wzoru na koszt drzewa rozpinającego ustalana jest jakość rozwiązania. Następnie droga selekcji turniejowej wybierane są rozwiązania do krzyżowania. Rozwiązania powstałe wskutek krzyżowania zamieniają najsłabsze rozwiązania z populacji. Oprócz krzyżowania rozwiązania z pewnym prawdopodobieństwem poddawane są operacji losowej mutacji.
 
 
-W celu ustalenia początkowej populacji konieczne jest wygenerowanie losowych grafów będących drzewami rozpinającymi (niekoniecznie minimalnymi). Ważne jest aby rozkład z którego losowane są drzewa rozpinające był rozkładem jednostajnym, dzięki czemu możliwe będzie przeszukiwanie przestrzeni rozwiązań bez uprzywilejowanego traktowania części rozwiązań. Losowe drzewo rozpinające uzyskuje się rozpoczynając błądzenie losowe zaczynając od losowego wierzchołka.
+W celu ustalenia początkowej populacji konieczne jest wygenerowanie losowych grafów będących drzewami rozpinającymi (niekoniecznie minimalnymi). Ważne jest aby rozkład z którego losowane są drzewa rozpinające był rozkładem jednostajnym, dzięki czemu możliwe będzie przeszukiwanie przestrzeni rozwiązań bez uprzywilejowanego traktowania części rozwiązań. Losowe drzewo rozpinające uzyskuje się rozpoczynając błądzenie losowe zaczynając od losowego wierzchołka, jest to powszechnie stosowana praktyka\Cite{Wilson}.
 
 \begin{figure}[h!]
  \centering
@@ -186,7 +192,7 @@ W celu ustalenia początkowej populacji konieczne jest wygenerowanie losowych gr
 \end{figure}
 
 
-Operator mutacji opiera się na usunięciu losowej krawędzi z mutowanego drzewa rozpinającego oraz połączeniu powstałych w ten sposób dwóch spójnych podgrafów inna krawędzią, wylosowywaną spośród wszystkich możliwych.
+Operator mutacji opiera się na usunięciu losowej krawędzi z mutowanego drzewa rozpinającego oraz połączeniu powstałych w ten sposób dwóch spójnych podgrafów inna krawędzią, wylosowywaną spośród wszystkich możliwych. Jest to algorytm wymyślony przez nas.
 
 
 \begin{figure}[h!]
@@ -210,7 +216,7 @@ Operator mutacji opiera się na usunięciu losowej krawędzi z mutowanego drzewa
 \end{figure}
  
  
-Operator krzyżowania na podstawie dwóch osobników tworzy nowe rozwiązanie posiadające cechy zarówno jednego jak i drugiego osobnika. w pierwotnej wersji operator krzyżowania opierał się na wybraniu największego, wspólnego, spójnego podgrafu i generacji reszty grafu błądzeniem losowym. W testach okazało się jednak, że tak zdefiniowany operator generuje zbyt losowe wyniki. Obecny operator sumuje ze sobą zbiory krawędzi rodziców i w tak powstałym grafie znajduje drzewo rozpinające.
+Operator krzyżowania na podstawie dwóch osobników tworzy nowe rozwiązanie posiadające cechy zarówno jednego jak i drugiego osobnika. w pierwotnej wersji operator krzyżowania opierał się na wybraniu największego, wspólnego, spójnego podgrafu i generacji reszty grafu błądzeniem losowym. W testach okazało się jednak, że tak zdefiniowany operator generuje zbyt losowe wyniki. Obecny operator sumuje ze sobą zbiory krawędzi rodziców i w tak powstałym grafie znajduje drzewo rozpinające. Podobnie jak w przypadku operatora mutacji jest to nasze autorskie rozwiązanie.
  
  
  
@@ -229,14 +235,12 @@ Operator krzyżowania na podstawie dwóch osobników tworzy nowe rozwiązanie po
 \end{figure}
  
  
-W projekcie wykorzystano również mechanizmy zaczerpnięte z algorytmu symulowanego wyżarzania. Jest to algorytm wzorowany procesie wyżarzania stosowanego w metalurgii. Opiera się ono o stopniowym, kontrolowanym zmniejszaniu temperatury metalu celem optymalizacji (minimalizacji) energii swobodnej układu. Opierając się na tym mechanizmie, część parametrów procesu ewolucyjnego również podlega procesowi powolnej zmiany według ustalonego planu, należą do nich:
+W projekcie wykorzystano również mechanizmy zaczerpnięte z algorytmu symulowanego wyżarzania\Cite{SA}. Jest to algorytm wzorowany na procesie wyżarzania stosowanego w metalurgii. Opiera się ono o stopniowym, kontrolowanym zmniejszaniu temperatury metalu celem optymalizacji (minimalizacji) energii swobodnej układu. Opierając się na tym mechanizmie, część parametrów procesu ewolucyjnego również podlega procesowi powolnej zmiany według ustalonego planu, należą do nich:
 
 \begin{itemize}
   \item prawdopodobieństwo mutacji
   \item wielkość turnieju
 \end{itemize}
-
-
 
 
  \section{Zbior testowy i wyniki}
@@ -254,23 +258,7 @@ Do testów zostały wybrane 3 grafy odpowiednio z: 10, 15 i 20 wierzchołkami. W
 
 \input{results.tex}
 
-
-\begin{thebibliography}{9}
-
-\bibitem{Assad}
-  A. Assad, W. Xu,
-  \emph{The quadratic minimum spanning tree problem.}.
-  Naval Research Logistics, 1992,Vol.39, 399–417.
-  
-\bibitem{Benchmark}
-  http://homes.di.unimi.it/~cordone/research/DataQMST10-30.zip
-  
-  
-\bibitem{Results}
-  http://homes.di.unimi.it/~cordone/research/ResultsQMST.pdf
-
-
-\end{thebibliography}
+\input{bibl.tex}
 
 % Following is a new environment, {scilastnote}, that's defined in the
 % preamble and that allows authors to add a reference at the end of the
