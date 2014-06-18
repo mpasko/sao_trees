@@ -123,54 +123,52 @@
 % choice.  Either way, use the asterisk (*) modifier, as shown, to
 % suppress numbering.
 
-\section*{Wstęp}
+\section*{Sformułowanie problemu}
 
 
 
 
 
-\section{Sformułowanie problemu}
-
-Niech $G =(V,E)$ bedzie nieskierowanym grafem ze zbiorem wierzcholkow V i zbiorem krawedzi E. Problem kwadratowego minimalnego drzewa rozpinajacego (QMSTP, quadratic minimum spanning tree). Kazda krawedz posiada przypisany koszt $e_{g}$ oraz każda para krawedzi posiada koszt $c_{eg}$. Minimalizowany koszt drzewa rozpinajacego $T= (V, E(T))$ jest wyrazony:
+Niech $G =(V,E)$ będzie nieskierowanym grafem ze zbiorem wierzchołków V i zbiorem krawędzi E. Problem kwadratowego minimalnego drzewa rozpinającego (QMSTP, quadratic minimum spanning tree) w którym każda krawędź posiada przypisany koszt $e_{g}$ oraz każda para krawędzi posiada koszt $c_{eg}$ i minimalizowany koszt drzewa rozpinającego $T= (V, E(T))$ jest wyrazony:
 $$ F(T) = \sum_{e \in E(T) } c_e + \sum_{(e,g) \in \Psi (T)} c_{eg} $$
 
- $\Psi (T)$ oznacza zbior wszystkich par krawedzi znajdujacych sie w drzewie $T$. Rozwiazania QMSTP znajduja zastosowanie w telekomunikacji, logistyce i dystrybucji energii.
+ $\Psi (T)$ oznacza zbiór wszystkich par krawędzi znajdujących sie w drzewie $T$. Rozwiązania QMSTP znajdują zastosowanie w telekomunikacji, logistyce i dystrybucji energii.
  
- Problem QMST jest NP-trudny \cite{Assad}, przez co optymalny algorytm rozwiazujacy go w czasie wielomianowym istnieje tylko jesli $P=NP$. Uzasadnione jest wiec wykorzystanie do znalezienia rozwiazania jednej z wielu dostepnych metaheurystyk.
+ Problem QMST jest NP-trudny \cite{Assad}, przez co optymalny algorytm rozwiązujący go w czasie wielomianowym istnieje tylko jesli $P=NP$. Uzasadnione jest wiec wykorzystanie do znalezienia rozwiązania jednej z wielu dostępnych metaheurystyk.
  
  \section{Wykorzystana metaheurystyka}
 
-Zastosowanie regul zaczerpnietych z procesow ewolucyjnych jest powszechnie stosowana praktyka podczas rozwiazywania problemow ewolucyjnych. Na potrzeby naszego projektu wykorzystalismy algorytm genetyczny jako matryce do stworzenia wlasciwego algorytmu. W trakcie rozwiazywania QMSTP utrzymujemy populacje rozwiazan, gdzie pojedynczy osobnik stanowi pojedyncze drzewo rozpinajace w grafie $G$. Reprezentowany jest w postaci grafu odpowiadajacego liscie krawedzi z oryginalnego grafu. Korzystajac z wzoru na koszt drzewa rozpinajacego ustalana jest jakosc rozwiazania. Nastepnie droga selekcji turniejowej wybierane sa rozwiazania do krzyzowania. Rozwiazania powstale wskutek krzyzowania zamieniaja najslabsze rozwiazania z populacji. Oprocz krzyzowania rozwiazania z pewnym prawdopodbienstwem poddawane sa operacji losowej mutacji.
+Zastosowanie reguł zaczerpniętych z procesów ewolucyjnych jest powszechnie stosowana praktyka podczas rozwiązywania problemów ewolucyjnych. Na potrzeby naszego projektu wykorzystaliśmy algorytm genetyczny jako matryce do stworzenia właściwego algorytmu. W trakcie rozwiązywania QMSTP utrzymujemy populacje rozwiązań, gdzie pojedynczy osobnik stanowi pojedyncze drzewo rozpinające w grafie $G$. Reprezentowany jest w postaci grafu odpowiadającego liście krawędzi z oryginalnego grafu. Korzystając z wzoru na koszt drzewa rozpinającego ustalana jest jakość rozwiązania. Następnie droga selekcji turniejowej wybierane są rozwiązania do krzyżowania. Rozwiązania powstałe wskutek krzyżowania zamieniają najsłabsze rozwiązania z populacji. Oprócz krzyżowania rozwiązania z pewnym prawdopodobieństwem poddawane są operacji losowej mutacji.
 
 
-W celu ustalenia poczatkowej populacji konieczne jest wygenerowanie losowych grafow bedacych drzewami rozpinajacymi (niekoniecznie losowymi). Wazne jest aby rozklad z ktorego losowane sa drzewa rozpinajace byl rozkladem jednostajnym, dzieki czemu mozliwe bedzie przeszukiwanie przestrzeni rozwiazan bez uprzywilejowanego traktowania czesci rozwiazan. Losowe drzewo rozpinajace uzyskuje sie rozpoczynajac bladzenie losowe zaczynajac od losowego wierzcholka. 
+W celu ustalenia początkowej populacji konieczne jest wygenerowanie losowych grafów będących drzewami rozpinającymi (niekoniecznie minimalnymi). Ważne jest aby rozkład z którego losowane są drzewa rozpinające był rozkładem jednostajnym, dzięki czemu możliwe będzie przeszukiwanie przestrzeni rozwiązań bez uprzywilejowanego traktowania części rozwiązań. Losowe drzewo rozpinające uzyskuje się rozpoczynając błądzenie losowe zaczynając od losowego wierzchołka.
 
 \begin{figure}[h!]
  \centering
 \begin{algorithmic}
-\Function{RandomTree}{} 
+\Function{RandomTree}{}
 \State $r\gets \Call{RandomVertex}{nil}$
-\For{ $i < n$} 
-	\State $InTree[i] \gets false $
-	\State $i\gets i+1$
+\For{ $i < n$}
+    \State $InTree[i] \gets false $
+    \State $i\gets i+1$
 \EndFor
 \State $Next[r] \gets nil $
 \State $InTree[r] \gets true $
 
 
-\For{ $i < n$} 
-	\State $u \gets 1 $
-    \While{not InTree[u]} 
-    	\State $Next[u] \gets \Call{RandomSuccessor}{u}$
+\For{ $i < n$}
+    \State $u \gets 1 $
+    \While{not InTree[u]}
+        \State $Next[u] \gets \Call{RandomSuccessor}{u}$
         \State $u \gets Next[u]$
     \EndWhile
     \State $u\gets i$
-    \While{not InTree[u]} 
-    	\State $InTree[u] \gets true$
+    \While{not InTree[u]}
+        \State $InTree[u] \gets true$
         \State $u \gets Next[u]$
     \EndWhile
-    
-	\State $i\gets i+1$
+   
+    \State $i\gets i+1$
 \EndFor
 
 
@@ -179,19 +177,58 @@ W celu ustalenia poczatkowej populacji konieczne jest wygenerowanie losowych gra
 \EndFunction
 
 \end{algorithmic}
-\caption{Algorytm generujacy losowe drzewo rozpinajace}
+\caption{Algorytm generujący losowe drzewo rozpinające}
 \end{figure}
 
 
+Operator mutacji opiera się na usunięciu losowej krawędzi z mutowanego drzewa rozpinającego oraz połączeniu powstałych w ten sposób dwóch spójnych podgrafów inna krawędzią, wylosowywaną spośród wszystkich możliwych.
 
 
+\begin{figure}[h!]
+ \centering
+\begin{algorithmic}
+\Function{MutateTree}{}
+\State $u\gets \Call{RandomVertex}{nil}$
+\State $v\gets \Call{NeighbourVertices}{u}$
+\State $\Call{RemoveEdge}{u,v}$
 
-W projekcie wykorzystano rowniez mechanizmy zaczerpniete z algorytmu symulowanego wyzarzania. Jest to algorytm wzorowany procesie wyzarzania stosowanego w metalurgii. Opiera sie ono o stopniowym, kontrolowanym zmniejszaniu temperatury metalu celem optymalizacji (minimalizacji) energii swobodnej materialu. Opierajac sie na tym mechanizmie, czesc parametrow procesu ewolucyjnego rowniez podlega procesowi powolnej zmiany wedlug ustalonego planu, naleza do nich:
+\State $u_{vertices}\gets \Call{AccessibleVertices}{u}$
+\State $v_{vertices}\gets \Call{AccessibleVertices}{v}$
+\State $edges \gets \Call{PossibleEdges}{u_{vertices}, v_{vertices}}$
+\State $edge \gets \Call{RandomSelect}{edges}$
+\State $\Call{AddEdge}{edge[0],edge[1]}$
+
+\EndFunction
+
+\end{algorithmic}
+\caption{Algorytm mutujący wybrane drzewo rozpinające}
+\end{figure}
+ 
+ 
+Operator krzyżowania na podstawie dwóch osobników tworzy nowe rozwiązanie posiadające cechy zarówno jednego jak i drugiego osobnika. w pierwotnej wersji operator krzyżowania opierał się na wybraniu największego, wspólnego, spójnego podgrafu i generacji reszty grafu błądzeniem losowym. W testach okazało się jednak, że tak zdefiniowany operator generuje zbyt losowe wyniki. Obecny operator sumuje ze sobą zbiory krawędzi rodziców i w tak powstałym grafie znajduje drzewo rozpinające.
+ 
+ 
+ 
+\begin{figure}[h!]
+ \centering
+\begin{algorithmic}
+\Function{Crossover}{parent1, parent2}
+\State $graph \gets \Call{Compose}{parent1, parent2}$
+\State $offspring \gets \Call{RandomSpanningTree}{graph}$
+\Return $offspring$
+
+\EndFunction
+
+\end{algorithmic}
+\caption{Algorytm dokonujacy operacji krzyzowania}
+\end{figure}
+ 
+ 
+W projekcie wykorzystano również mechanizmy zaczerpnięte z algorytmu symulowanego wyżarzania. Jest to algorytm wzorowany procesie wyżarzania stosowanego w metalurgii. Opiera się ono o stopniowym, kontrolowanym zmniejszaniu temperatury metalu celem optymalizacji (minimalizacji) energii swobodnej układu. Opierając się na tym mechanizmie, część parametrów procesu ewolucyjnego również podlega procesowi powolnej zmiany według ustalonego planu, należą do nich:
 
 \begin{itemize}
-  \item prawdopodobienstwo mutacji
-  \item wielkosc turnieju
-  \item The third etc \ldots
+  \item prawdopodobieństwo mutacji
+  \item wielkość turnieju
 \end{itemize}
 
 
@@ -200,31 +237,31 @@ W projekcie wykorzystano rowniez mechanizmy zaczerpniete z algorytmu symulowaneg
  \section{Zbior testowy i wyniki}
 
 
- Do testow wykorzystano benchmark udstepniony przez Roberto Cordone. Zawiera on zbior grafow rozniacych sie od siebie:
+ Do testów wykorzystano benchmark udostępniony przez Roberto Cordone\cite{Bechmark}. Zawiera on zbiór grafów różniących się od siebie:
  
  \begin{itemize}
-  \item iloscia wierzcholkow (od 10 do 50 wierzchołków)
-  \item gestoscia grafow ($\frac{1}{3}, \frac{2}{3}, 1$)
-  \item zakresem kosztow krawedzi i kosztow pomiedzy parami krawedzi (dwa dyskretne zakresy: 1-10,1-100) 
+  \item ilością wierzchołków (od 10 do 50 wierzchołków)
+  \item gęstością grafu ($\frac{1}{3}, \frac{2}{3}, 1$)
+  \item zakresem kosztów krawędzi i kosztów pomiędzy parami krawędzi (dwa dyskretne zakresy: 1-10,1-100)
 \end{itemize}
 
-Do testow zostaly wybrane 3 grafy odpowiednio z: 10, 15 i 20 wierzcholkami. Wszystkie grafy sa grafami pelnymi oraz wartosci kosztow znajduja sie w wiekszym zakresie: 1-100. Dysponujemy dla nich rowniez najlepszymi uzyskanymi rezultatami, odpowiednio: 2197, 5879 i 11101.
-
-
-\begin{thebibliography}{9}
-
-\bibitem{Assad}
-  A. Assad, W. Xu,
-  \emph{The quadratic minimum spanning tree problem.}.
-  Naval Research Logistics, 1992,Vol.39, 399–417.
-
-\end{thebibliography}
-
+Do testów zostały wybrane 3 grafy odpowiednio z: 10, 15 i 20 wierzchołkami. Wszystkie grafy są grafami pełnymi oraz wartości kosztów znajdują się w zakresie: 1-100. Dysponujemy dla nich również najlepszymi uzyskanymi rezultatami, odpowiednio: 2197, 5879 i 11101\cite{Results}.
 
 \input{results.tex}
 
 
 \bibliography{scibib}
+\bibitem{Assad}
+  A. Assad, W. Xu,
+  \emph{The quadratic minimum spanning tree problem.}.
+  Naval Research Logistics, 1992,Vol.39, 399–417.
+  
+\bibitem{Benchmark}
+  http://homes.di.unimi.it/~cordone/research/DataQMST10-30.zip
+  
+  
+\bibitem{Results}
+  http://homes.di.unimi.it/~cordone/research/ResultsQMST.pdf
 
 \bibliographystyle{Science}
 
